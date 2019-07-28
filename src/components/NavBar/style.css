@@ -1,0 +1,16 @@
+.my-nav {
+  width: 100%;
+  text-align: center;
+  font-size: 2rem;
+  padding: 20px 0px;
+  text-decoration: none;
+  background-color: #2A77AE;
+  color: black;
+  margin-bottom: 30px;
+  flex-flow: row wrap;
+  display: flex;
+}
+
+.my-nav > .nav-item {
+  margin: 0% 9%;
+}
