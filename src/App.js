@@ -1,36 +1,78 @@
 import React, { Component } from "react";
-import FriendCard from "./components/FriendCard";
+import MemCard from "./components/MemCard";
 import Wrapper from "./components/Wrapper";
-import Title from "./components/Title";
-import friends from "./friends.json";
+import NavBar from "./components/NavBar";
+import cards from "./cards.json";
 
 class App extends Component {
   // Setting this.state.friends to the friends json array
   state = {
-    friends
+    cards,
+    score: 0,
+    highScore: 0,
+    alreadyClicked: [],
   };
 
-  removeFriend = id => {
-    // Filter this.state.friends for friends with an id not equal to the id being removed
-    const friends = this.state.friends.filter(friend => friend.id !== id);
-    // Set this.state.friends equal to the new friends array
-    this.setState({ friends });
-  };
+  resetGame() {
+    this.setState({
+      alreadyClicked: [],
+      score: 0,
+    })
+  }
+
+  shuffleCards() {
+    const shuffled = [...this.state.cards];
+    // https://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; // swap elements
+    }
+    return shuffled;
+  }
+
+  checkHighScore() {
+    const { score, highScore, cards } = this.state;
+    if (score > highScore) {
+      this.setState({ highScore: score }, () => {
+        if (score === cards.length) {
+          alert("You won!");
+          this.resetGame();
+        }
+      });
+    }
+  }
+
+  handleClick = (id) => {
+    const { alreadyClicked } = this.state;
+    if (alreadyClicked.includes(id)) {
+      alert("You Lost");
+      this.resetGame();
+    } else {
+      this.setState({
+        alreadyClicked: [...alreadyClicked, id],
+        cards: this.shuffleCards(),
+        score: this.state.score + 1,
+      }, () => {
+        this.checkHighScore();
+      });
+    }
+  }
 
   // Map over this.state.friends and render a FriendCard component for each friend object
   render() {
+    const { score, highScore, cards } = this.state;
     return (
       <Wrapper>
-        <Title>Friends List</Title>
-        {this.state.friends.map(friend => (
-          <FriendCard
-            removeFriend={this.removeFriend}
-            id={friend.id}
-            key={friend.id}
-            name={friend.name}
-            image={friend.image}
-            occupation={friend.occupation}
-            location={friend.location}
+        <NavBar
+          score={ score }
+          highScore={ highScore }
+        />
+        {cards.map(card => (
+          <MemCard
+            id={card.id}
+            key={card.id}
+            image={card.image}
+            clickHandler={this.handleClick}
           />
         ))}
       </Wrapper>
